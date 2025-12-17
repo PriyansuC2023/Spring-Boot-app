@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Book</title>
+</head>
+<body>
+
+<h2>Add New Book</h2>
+
+<form th:action="@{/ui/books/save}"
+      method="post"
+      enctype="multipart/form-data">
+
+    <!-- CSRF -->
+    <input type="hidden"
+           th:name="${_csrf.parameterName}"
+           th:value="${_csrf.token}" />
+
+    <label>Title:</label>
+    <input type="text" name="title" required /><br><br>
+
+    <label>Author:</label>
+    <input type="text" name="author" required /><br><br>
+
+    <label>Description:</label>
+    <textarea name="description"></textarea><br><br>
+
+    <!-- 🔴 THIS IS THE MOST IMPORTANT LINE -->
+    <label>PDF File:</label>
+    <input type="file" name="file" accept="application/pdf" required />
+    <br><br>
+
+    <button type="submit">Save</button>
+</form>
+
+</body>
+</html>
