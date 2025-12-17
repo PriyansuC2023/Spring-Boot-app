@@ -1,28 +1,14 @@
-# Java 17 base image (recommended for Spring Boot)
+# Use Java 17 (same as your project)
 FROM eclipse-temurin:17-jdk-alpine
 
-# Set working directory
+# Set working directory inside container
 WORKDIR /app
 
-# Copy Maven wrapper & config
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
+# Copy jar file from target folder
+COPY target/ebookapp-0.0.1-SNAPSHOT.jar app.jar
 
-# Give execute permission
-RUN chmod +x mvnw
+# Expose application port
+EXPOSE 8880
 
-# Download dependencies (faster builds)
-RUN ./mvnw dependency:go-offline
-
-# Copy source code
-COPY src src
-
-# Build application
-RUN ./mvnw clean package -DskipTests
-
-# Expose Render port
-EXPOSE 10000
-
-# Run Spring Boot jar
-CMD ["java", "-jar", "target/*.jar"]
+# Run Spring Boot application
+ENTRYPOINT ["java", "-jar", "app.jar"]
