@@ -1,14 +1,13 @@
-# Use Java 17 (same as your project)
-FROM eclipse-temurin:17-jdk-alpine
-
-# Set working directory inside container
+# -------- BUILD STAGE --------
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Copy jar file from target folder
-COPY target/ebookapp-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose application port
+# -------- RUN STAGE --------
+FROM eclipse-temurin:17-jdk-alpine
+WORKDIR /app
+COPY --from=build /app/target/*jar app.jar
 EXPOSE 8880
-
-# Run Spring Boot application
 ENTRYPOINT ["java", "-jar", "app.jar"]
