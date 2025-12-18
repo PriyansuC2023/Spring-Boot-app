@@ -3,21 +3,41 @@ package com.example.ebookapp.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "books")
 public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
+
     private String author;
+
+    private String category;
+
+    @Column(length = 2000)
     private String description;
 
-    // 🔥 REQUIRED FOR PDF
-    private String fileName;
-    private String filePath;
+    // stores uploaded file name or path (NOT MultipartFile)
+    @Column(name = "pdf_path")
+    private String pdfPath;
 
-    // ===== GETTERS & SETTERS =====
+    // ----- Constructors -----
+
+    public Book() {
+    }
+
+    public Book(String title, String author, String category, String description, String pdfPath) {
+        this.title = title;
+        this.author = author;
+        this.category = category;
+        this.description = description;
+        this.pdfPath = pdfPath;
+    }
+
+    // ----- Getters & Setters -----
 
     public Long getId() {
         return id;
@@ -43,6 +63,14 @@ public class Book {
         this.author = author;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -51,20 +79,11 @@ public class Book {
         this.description = description;
     }
 
-    // 🔥 VERY IMPORTANT
-    public String getFileName() {
-        return fileName;
+    public String getPdfPath() {
+        return pdfPath;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public void setPdfPath(String pdfPath) {
+        this.pdfPath = pdfPath;
     }
 }
