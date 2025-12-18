@@ -32,7 +32,7 @@ public class BookController {
     @GetMapping
     public String listBooks(Model model) {
         model.addAttribute("books", bookService.getAllBooks());
-        return "list";
+        return "books/list";
     }
 
     /* =========================
@@ -42,7 +42,7 @@ public class BookController {
     @GetMapping("/new")
     public String showNewForm(Model model) {
         model.addAttribute("book", new Book());
-        return "new";
+        return "books/new";
     }
 
     /* =========================
@@ -77,7 +77,7 @@ public class BookController {
     public String showEditForm(@PathVariable Long id, Model model) {
         Book book = bookService.getById(id);
         model.addAttribute("book", book);
-        return "edit";
+        return "books/edit";
     }
 
     /* =========================
