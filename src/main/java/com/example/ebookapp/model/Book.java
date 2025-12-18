@@ -13,31 +13,23 @@ public class Book {
     @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false)
     private String author;
-
-    private String category;
 
     @Column(length = 2000)
     private String description;
 
-    // stores uploaded file name or path (NOT MultipartFile)
-    @Column(name = "pdf_path")
-    private String pdfPath;
+    // Stored file name (UUID_filename.pdf)
+    @Column(name = "file_name")
+    private String fileName;
 
-    // ----- Constructors -----
+    // Original uploaded file name
+    @Column(name = "original_file_name")
+    private String originalFileName;
 
-    public Book() {
-    }
-
-    public Book(String title, String author, String category, String description, String pdfPath) {
-        this.title = title;
-        this.author = author;
-        this.category = category;
-        this.description = description;
-        this.pdfPath = pdfPath;
-    }
-
-    // ----- Getters & Setters -----
+    /* =====================
+       GETTERS & SETTERS
+       ===================== */
 
     public Long getId() {
         return id;
@@ -63,14 +55,6 @@ public class Book {
         this.author = author;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -79,11 +63,19 @@ public class Book {
         this.description = description;
     }
 
-    public String getPdfPath() {
-        return pdfPath;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setPdfPath(String pdfPath) {
-        this.pdfPath = pdfPath;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getOriginalFileName() {
+        return originalFileName;
+    }
+
+    public void setOriginalFileName(String originalFileName) {
+        this.originalFileName = originalFileName;
     }
 }

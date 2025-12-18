@@ -1,6 +1,7 @@
 package com.example.ebookapp.service;
 
 import com.example.ebookapp.model.Book;
+
 import java.util.List;
 
 public interface BookService {
@@ -9,9 +10,9 @@ public interface BookService {
 
     Book getById(Long id);
 
-    Book save(Book book, String filePath);
+    void save(Book book, String storedFileName);
 
-    Book update(Long id, Book book, String filePath);
+    void update(Long id, Book book, String storedFileName);
 
     void delete(Long id);
 }
