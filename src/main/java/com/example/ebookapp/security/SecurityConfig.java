@@ -31,13 +31,13 @@ public class SecurityConfig {
                                 "/images/**",
                                 "/uploads/**"
                         ).permitAll()
-                        .requestMatchers("/ui/books/**").authenticated()
+
                         .anyRequest().authenticated()
                 )
 
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/ui/books", true)
+                        .defaultSuccessUrl("/books", true)
                         .permitAll()
                 )
 
