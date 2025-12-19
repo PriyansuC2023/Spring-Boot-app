@@ -12,43 +12,39 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 public class SecurityConfig {
 
-    // 🔐 REQUIRED FOR LOGIN / SIGNUP
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/h2-console/**")
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/h2-console/**",
                                 "/login",
                                 "/signup",
                                 "/css/**",
-                                "/js/**",
-                                "/images/**",
-                                "/uploads/**"
+                                "/js/**"
                         ).permitAll()
-
                         .anyRequest().authenticated()
                 )
-
                 .formLogin(form -> form
                         .loginPage("/login")
                         .defaultSuccessUrl("/books", true)
                         .permitAll()
                 )
+                .logout(logout -> logout.permitAll());
 
-                .logout(logout -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                        .logoutSuccessUrl("/login?logout")
-                        .permitAll()
-                )
-
-                .csrf(Customizer.withDefaults());
+        // Required for H2 Console
+        http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
+    }
+
+    // 🔥 THIS FIXES YOUR CURRENT ERROR
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

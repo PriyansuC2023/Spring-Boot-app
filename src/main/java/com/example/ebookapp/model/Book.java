@@ -10,26 +10,21 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
     private String author;
 
     @Column(length = 2000)
     private String description;
 
-    // Stored file name (UUID_filename.pdf)
-    @Column(name = "file_name")
-    private String fileName;
+    // 🔴 STORE PDF IN DATABASE
+    @Lob
+    @Column(columnDefinition = "BYTEA")
+    private byte[] pdfData;
 
-    // Original uploaded file name
-    @Column(name = "original_file_name")
     private String originalFileName;
 
-    /* =====================
-       GETTERS & SETTERS
-       ===================== */
+    // ===== GETTERS & SETTERS =====
 
     public Long getId() {
         return id;
@@ -63,12 +58,12 @@ public class Book {
         this.description = description;
     }
 
-    public String getFileName() {
-        return fileName;
+    public byte[] getPdfData() {
+        return pdfData;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setPdfData(byte[] pdfData) {
+        this.pdfData = pdfData;
     }
 
     public String getOriginalFileName() {

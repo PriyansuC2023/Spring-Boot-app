@@ -6,13 +6,15 @@ import java.util.List;
 
 public interface BookService {
 
+    // Save book with PDF
+    void saveBook(Book book);
+
+    // Get all books
     List<Book> getAllBooks();
 
-    Book getById(Long id);
+    // Get single book by ID (for PDF view)
+    Book getBookById(Long id);
 
-    void save(Book book, String storedFileName);
-
-    void update(Long id, Book book, String storedFileName);
-
-    void delete(Long id);
+    // Delete book
+    void deleteBook(Long id);
 }

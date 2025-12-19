@@ -2,18 +2,16 @@ package com.example.ebookapp.controller;
 
 import com.example.ebookapp.model.Book;
 import com.example.ebookapp.service.BookService;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
+import java.util.List;
 
 @Controller
 @RequestMapping("/books")
@@ -25,109 +23,75 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    /* =========================
-       LIST PAGE
-       URL: /books
-       ========================= */
+    // =========================
+    // LIST BOOKS
+    // =========================
     @GetMapping
     public String listBooks(Model model) {
-        model.addAttribute("books", bookService.getAllBooks());
+        List<Book> books = bookService.getAllBooks();
+        model.addAttribute("books", books);
         return "books/list";
     }
 
-    /* =========================
-       NEW BOOK FORM
-       URL: /books/new
-       ========================= */
+    // =========================
+    // SHOW ADD BOOK FORM
+    // =========================
     @GetMapping("/new")
-    public String showNewForm(Model model) {
+    public String showAddForm(Model model) {
         model.addAttribute("book", new Book());
         return "books/new";
     }
 
-    /* =========================
-       SAVE BOOK
-       URL: /books/save
-       ========================= */
+    // =========================
+    // SAVE BOOK WITH PDF
+    // =========================
     @PostMapping("/save")
     public String saveBook(
-            @ModelAttribute Book book,
+            @RequestParam String title,
+            @RequestParam String author,
+            @RequestParam String description,
             @RequestParam("file") MultipartFile file
     ) throws IOException {
 
-        String uploadDir = "uploads/";
-        java.io.File dir = new java.io.File(uploadDir);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
+        Book book = new Book();
+        book.setTitle(title);
+        book.setAuthor(author);
+        book.setDescription(description);
+        book.setOriginalFileName(file.getOriginalFilename());
+        book.setPdfData(file.getBytes());
 
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        java.io.File dest = new java.io.File(uploadDir + fileName);
-        file.transferTo(dest);
+        bookService.saveBook(book);
 
-        bookService.save(book, fileName);
         return "redirect:/books";
     }
 
-    /* =========================
-       EDIT BOOK FORM
-       URL: /books/edit/{id}
-       ========================= */
-    @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id, Model model) {
-        Book book = bookService.getById(id);
-        model.addAttribute("book", book);
-        return "books/edit";
-    }
+    // =========================
+    // VIEW / DOWNLOAD PDF
+    // =========================
+    @GetMapping("/file/{id}")
+    public ResponseEntity<byte[]> viewPdf(@PathVariable Long id) {
 
-    /* =========================
-       UPDATE BOOK
-       URL: /books/update/{id}
-       ========================= */
-    @PostMapping("/update/{id}")
-    public String updateBook(
-            @PathVariable Long id,
-            @ModelAttribute Book book,
-            @RequestParam(value = "file", required = false) MultipartFile file
-    ) throws IOException {
+        Book book = bookService.getBookById(id);
 
-        String fileName = null;
-
-        if (file != null && !file.isEmpty()) {
-            String uploadDir = "uploads/";
-            java.io.File dir = new java.io.File(uploadDir);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-
-            fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            java.io.File dest = new java.io.File(uploadDir + fileName);
-            file.transferTo(dest);
+        if (book == null || book.getPdfData() == null) {
+            return ResponseEntity.notFound().build();
         }
 
-        bookService.update(id, book, fileName);
-        return "redirect:/books";
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"" + book.getOriginalFileName() + "\""
+                )
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(book.getPdfData());
     }
 
-    /* =========================
-       DELETE BOOK
-       URL: /books/delete/{id}
-       ========================= */
+    // =========================
+    // DELETE BOOK (OPTIONAL)
+    // =========================
     @GetMapping("/delete/{id}")
     public String deleteBook(@PathVariable Long id) {
-        bookService.delete(id);
+        bookService.deleteBook(id);
         return "redirect:/books";
-    }
-
-    /* =========================
-       DOWNLOAD / VIEW PDF
-       URL: /books/file/{id}
-       ========================= */
-    @GetMapping("/file/{id}")
-    @ResponseBody
-    public Resource viewFile(@PathVariable Long id) throws MalformedURLException {
-        Book book = bookService.getById(id);
-        Path path = Paths.get("uploads").resolve(book.getFileName());
-        return new UrlResource(path.toUri());
     }
 }
